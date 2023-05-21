@@ -21,6 +21,7 @@ import {
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { VideoResponse } from '../types/video-response';
 import { VideoUrl, VodMetadata } from '../types/video';
+import { ElectronWindow } from '../types/window';
 
 const snackBarConfig: MatSnackBarConfig = {
   duration: 3000,
@@ -82,13 +83,18 @@ export class TwitchVodServiceService {
   getSelectedFormat = (): Observable<string> => this.vodFormat;
 
   startDownload(
-    videoUrl: VideoUrl,
+    selectedSource: VideoUrl,
     selectedFormat: string,
     vodInfos: VodMetadata
   ) {
-    console.log(videoUrl);
+    console.log(selectedSource);
     console.log(selectedFormat);
     console.log(vodInfos);
+    (window as unknown as ElectronWindow).ipcRenderer.send('vod:download', {
+      selectedSource,
+      selectedFormat,
+      vodInfos,
+    });
   }
 
   private handleVideoInfoError(error: Error): Observable<never> {
