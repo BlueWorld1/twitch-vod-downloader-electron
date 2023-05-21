@@ -1,0 +1,10 @@
+<div class="container">
+  <mat-form-field>
+    <input
+      (input)="vodLinkChanged($event)"
+      matInput
+      placeholder="Saisissez du texte"
+    />
+  </mat-form-field>
+  <span>{{vodInfos | async | json}}</span>
+</div>

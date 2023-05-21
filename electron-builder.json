@@ -1,0 +1,19 @@
+{
+  "appId": "com.twitch.myapp",
+  "productName": "TwitchVodDownloader",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "dist/**/*",
+    "src/electron.js"
+  ],
+  "win": {
+    "target": "nsis"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true
+  }
+}
