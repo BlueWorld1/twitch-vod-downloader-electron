@@ -45,6 +45,7 @@ export class TwitchVodServiceService {
   private snackBar = inject(MatSnackBar);
   private vodLinkInput = new BehaviorSubject('');
   private vodInfosLoading = new BehaviorSubject(false);
+  private vodDownloading = new BehaviorSubject(false);
   private vodInfosError = new BehaviorSubject<Error | null>(null);
   private vodFormat = new BehaviorSubject<string>(formats[0]);
   private vodInfos = this.vodLinkInput.pipe(
@@ -74,6 +75,8 @@ export class TwitchVodServiceService {
 
   getVodInfosLoading = (): Observable<boolean> => this.vodInfosLoading;
 
+  getVodDownloading = (): Observable<boolean> => this.vodDownloading;
+
   getVodInfosError = (): Observable<Error | null> => this.vodInfosError;
 
   getFormats = (): string[] => formats;
@@ -87,10 +90,25 @@ export class TwitchVodServiceService {
     selectedFormat: string,
     vodInfos: VodMetadata
   ) {
-    console.log(selectedSource);
-    console.log(selectedFormat);
-    console.log(vodInfos);
-    (window as unknown as ElectronWindow).ipcRenderer.send('vod:download', {
+    const electronWindow = window as unknown as ElectronWindow;
+    electronWindow.ipcRenderer.on('vod:download:started', () =>
+      this.vodDownloading.next(true)
+    );
+    electronWindow.ipcRenderer.on(
+      'vod:download:finished',
+      (events: any, result: any) => {
+        this.vodDownloading.next(false);
+        if (result !== true) {
+          this.snackBar.open(
+            'Something went wrong during the download',
+            undefined,
+            snackBarConfig
+          );
+          console.error(result);
+        }
+      }
+    );
+    electronWindow.ipcRenderer.send('vod:download', {
       selectedSource,
       selectedFormat,
       vodInfos,

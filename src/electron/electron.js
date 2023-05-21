@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const packageJson = require(`${__dirname}/../package.json`);
+const packageJson = require(`${__dirname}/../../package.json`);
 const path = require("path");
 const { spawnSync } = require("child_process");
 let win;
@@ -9,7 +9,7 @@ function saveVodToDisk(source, metadata, format) {
     " ",
     "_"
   )}_${metadata.title.replaceAll(" ", "_")}.${format}`;
-  const command = `${__dirname}/../bin/youtube-dl --recode-video ${format} -o .\\VOD\\${filePath} ${source.url}`;
+  const command = `${__dirname}/../../bin/youtube-dl --recode-video ${format} -o .\\VOD\\${filePath} ${source.url}`;
 
   const result = spawnSync(command, { stdio: "inherit", shell: true });
 
@@ -30,7 +30,7 @@ function createWindow() {
     },
   });
 
-  win.loadURL(`file://${__dirname}/../dist/${packageJson.name}/index.html`);
+  win.loadURL(`file://${__dirname}/../../dist/${packageJson.name}/index.html`);
 
   win.on("closed", () => {
     win = null;
@@ -38,7 +38,9 @@ function createWindow() {
   ipcMain.on(
     "vod:download",
     (_, { selectedSource, selectedFormat, vodInfos }) => {
-      saveVodToDisk(selectedSource, vodInfos, selectedFormat);
+      win.webContents.send("vod:download:started");
+      const result = saveVodToDisk(selectedSource, vodInfos, selectedFormat);
+      win.webContents.send("vod:download:finished", result);
     }
   );
 }

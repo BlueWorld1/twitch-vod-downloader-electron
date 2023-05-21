@@ -14,6 +14,7 @@ export class VodDownloaderComponent {
   formats = this.twitchVodService.getFormats();
   selectedFormat = this.twitchVodService.getSelectedFormat();
   vodInfosLoading = this.twitchVodService.getVodInfosLoading();
+  vodDownloading = this.twitchVodService.getVodDownloading();
   vodInfosError = this.twitchVodService.getVodInfosError();
 
   vodLinkChanged($event: Event) {

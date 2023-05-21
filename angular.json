@@ -34,11 +34,6 @@
               "@angular/material/prebuilt-themes/deeppurple-amber.css",
               "src/styles.scss"
             ],
-            "allowedCommonJsDependencies": [
-              "electron",
-              "fs",
-              "path"
-            ],
             "scripts": []
           },
           "configurations": {

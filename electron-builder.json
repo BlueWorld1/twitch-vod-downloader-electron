@@ -7,7 +7,7 @@
   "files": [
     "dist/**/*",
     "bin/**/*",
-    "src/electron.js"
+    "src/electron/electron.js"
   ],
   "win": {
     "target": "nsis"
