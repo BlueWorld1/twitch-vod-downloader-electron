@@ -6,6 +6,7 @@
   },
   "files": [
     "dist/**/*",
+    "bin/**/*",
     "src/electron.js"
   ],
   "win": {

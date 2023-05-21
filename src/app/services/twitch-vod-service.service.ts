@@ -31,6 +31,7 @@ const resolutions: Resolutions = {
   '360p30': { res: '640x360', fps: 30 },
   '160p30': { res: '284x160', fps: 30 },
 };
+const formats: string[] = ['mp4', 'mkv', 'avi', 'webm', 'flv', 'ogg'];
 
 @Injectable({
   providedIn: 'root',
@@ -40,14 +41,18 @@ export class TwitchVodServiceService {
 
   private vodLinkInput = new BehaviorSubject('');
   private vodInfosLoading = new BehaviorSubject(false);
+  private vodInfosError = new BehaviorSubject<Error | null>(null);
+  private vodFormat = new BehaviorSubject<string>(formats[0]);
 
-  setVodLink(url: string): void {
-    this.vodLinkInput.next(url);
-  }
+  setVodLink = (url: string): void => this.vodLinkInput.next(url);
 
-  getVodInfo(): Observable<VideoResponse | null> {
-    return this.vodInfos;
-  }
+  getVodInfos = (): Observable<VideoResponse | null> => this.vodInfos;
+  getVodInfosLoading = (): Observable<boolean> => this.vodInfosLoading;
+  getVodInfosError = (): Observable<Error | null> => this.vodInfosError;
+
+  getFormats = (): string[] => formats;
+  setFormat = (value: string) => this.vodFormat.next(value);
+  getSelectedFormat = (): Observable<string> => this.vodFormat;
 
   private fetchTwitchDataGQL = (vodID: string): Observable<VideoResponse> => {
     const request = fetch('https://gql.twitch.tv/gql', {
@@ -68,6 +73,7 @@ export class TwitchVodServiceService {
     debounceTime(500),
     filter((input: string) => input.length > 2),
     distinctUntilChanged(),
+    tap(() => this.vodInfosError.next(null)),
     tap(() => this.vodInfosLoading.next(true)),
     switchMap((input: string) =>
       of(input).pipe(
@@ -84,6 +90,7 @@ export class TwitchVodServiceService {
   );
 
   private handleVideoInfoError(error: Error): Observable<never> {
+    this.vodInfosError.next(error);
     this.vodInfosLoading.next(false);
     this.snackBar.open(error.message, undefined, snackBarConfig);
     return EMPTY;

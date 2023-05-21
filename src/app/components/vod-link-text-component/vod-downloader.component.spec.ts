@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VodLinkTextComponentComponent } from './vod-link-text-component.component';
+import { VodDownloaderComponent } from './vod-downloader.component';
 
 describe('VodLinkTextComponentComponent', () => {
-  let component: VodLinkTextComponentComponent;
-  let fixture: ComponentFixture<VodLinkTextComponentComponent>;
+  let component: VodDownloaderComponent;
+  let fixture: ComponentFixture<VodDownloaderComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [VodLinkTextComponentComponent],
+      declarations: [VodDownloaderComponent],
     });
-    fixture = TestBed.createComponent(VodLinkTextComponentComponent);
+    fixture = TestBed.createComponent(VodDownloaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
