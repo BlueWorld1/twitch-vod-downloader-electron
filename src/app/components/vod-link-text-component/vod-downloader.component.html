@@ -1,24 +1,35 @@
-<div class="container">
-  <mat-form-field>
-    <mat-label>Format</mat-label>
-    <mat-select (selectionChange)="formatSelected($event)" [value]="selectedFormat | async">
-      <mat-option *ngFor="let option of formats" [value]="option">{{ option }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field class="input-field">
-    <mat-label>Twitch URL</mat-label>
-    <div class="input-container">
-      <input
-        (input)="vodLinkChanged($event)"
-        matInput
-        placeholder="https://www.twitch.tv/videos/123456789"
-      />
-      <mat-spinner *ngIf="(vodInfosLoading | async)" class="spinner" diameter="24"></mat-spinner>
-    </div>
-  </mat-form-field>
-</div>
-<mat-error *ngIf="(vodInfosError | async) as error">
-  {{error.message}}
-</mat-error>
-<span>{{vodInfos | async | json}}</span>
+<ng-container
+  *ngIf="{vodInfos: vodInfos | async, selectedFormat: selectedFormat | async, vodInfosError: vodInfosError | async, vodInfosLoading:vodInfosLoading | async} as observables">
+  <div class="container">
+    <mat-form-field>
+      <mat-label>Format</mat-label>
+      <mat-select (selectionChange)="formatSelected($event)" [value]="observables.selectedFormat">
+        <mat-option *ngFor="let option of formats" [value]="option">{{ option }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="input-field">
+      <mat-label>Twitch URL</mat-label>
+      <div class="input-container">
+        <input
+          (input)="vodLinkChanged($event)"
+          matInput
+          placeholder="https://www.twitch.tv/videos/123456789"
+        />
+        <mat-spinner *ngIf="(vodInfosLoading | async)" class="spinner" diameter="24"></mat-spinner>
+      </div>
+    </mat-form-field>
+    <mat-form-field *ngIf="observables.vodInfos" class="source-field">
+      <mat-label>Source</mat-label>
+      <mat-select (selectionChange)="sourceSelected($event, observables.selectedFormat, observables.vodInfos)">
+        <mat-option *ngFor="let option of observables.vodInfos.videos" [value]="option">{{ option.quality }}
+          @{{ option.fps }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <mat-error *ngIf="observables.vodInfosError">
+    {{observables.vodInfosError.message}}
+  </mat-error>
+  <span>{{observables?.vodInfos?.owner}} - {{observables?.vodInfos?.title}}</span>
+</ng-container>
+
 

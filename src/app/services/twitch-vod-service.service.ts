@@ -6,7 +6,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   filter,
-  from,
   map,
   Observable,
   of,
@@ -14,9 +13,14 @@ import {
   tap,
 } from 'rxjs';
 import { Resolutions } from '../types/resolution';
-import { extractTwitchVodIdFromUrl } from '../utils/utils';
+import {
+  extractTwitchVodIdFromUrl,
+  fetchTwitchDataGQL,
+  fetchVodMetadataById,
+} from '../utils/utils';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { VideoResponse } from '../types/video-response';
+import { VideoUrl, VodMetadata } from '../types/video';
 
 const snackBarConfig: MatSnackBarConfig = {
   duration: 3000,
@@ -38,37 +42,10 @@ const formats: string[] = ['mp4', 'mkv', 'avi', 'webm', 'flv', 'ogg'];
 })
 export class TwitchVodServiceService {
   private snackBar = inject(MatSnackBar);
-
   private vodLinkInput = new BehaviorSubject('');
   private vodInfosLoading = new BehaviorSubject(false);
   private vodInfosError = new BehaviorSubject<Error | null>(null);
   private vodFormat = new BehaviorSubject<string>(formats[0]);
-
-  setVodLink = (url: string): void => this.vodLinkInput.next(url);
-
-  getVodInfos = (): Observable<VideoResponse | null> => this.vodInfos;
-  getVodInfosLoading = (): Observable<boolean> => this.vodInfosLoading;
-  getVodInfosError = (): Observable<Error | null> => this.vodInfosError;
-
-  getFormats = (): string[] => formats;
-  setFormat = (value: string) => this.vodFormat.next(value);
-  getSelectedFormat = (): Observable<string> => this.vodFormat;
-
-  private fetchTwitchDataGQL = (vodID: string): Observable<VideoResponse> => {
-    const request = fetch('https://gql.twitch.tv/gql', {
-      method: 'POST',
-      body: JSON.stringify({
-        query: `query { video(id: "${vodID}") { broadcastType, createdAt, seekPreviewsURL, owner { login }, title }}`,
-      }),
-      headers: {
-        'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-    return from(request).pipe(switchMap((resp) => resp.json()));
-  };
-
   private vodInfos = this.vodLinkInput.pipe(
     debounceTime(500),
     filter((input: string) => input.length > 2),
@@ -81,13 +58,38 @@ export class TwitchVodServiceService {
         catchError(this.handleVideoInfoError.bind(this))
       )
     ),
-    switchMap((url: string) =>
-      this.fetchTwitchDataGQL(url).pipe(
+    switchMap((vodId: string) =>
+      fetchTwitchDataGQL(vodId).pipe(
         catchError(this.handleVideoInfoError.bind(this))
       )
     ),
+    switchMap((data: VideoResponse) => fetchVodMetadataById(data, resolutions)),
     tap(() => this.vodInfosLoading.next(false))
   );
+
+  setVodLink = (url: string): void => this.vodLinkInput.next(url);
+
+  getVodInfos = (): Observable<VodMetadata | null> => this.vodInfos;
+
+  getVodInfosLoading = (): Observable<boolean> => this.vodInfosLoading;
+
+  getVodInfosError = (): Observable<Error | null> => this.vodInfosError;
+
+  getFormats = (): string[] => formats;
+
+  setFormat = (value: string) => this.vodFormat.next(value);
+
+  getSelectedFormat = (): Observable<string> => this.vodFormat;
+
+  startDownload(
+    videoUrl: VideoUrl,
+    selectedFormat: string,
+    vodInfos: VodMetadata
+  ) {
+    console.log(videoUrl);
+    console.log(selectedFormat);
+    console.log(vodInfos);
+  }
 
   private handleVideoInfoError(error: Error): Observable<never> {
     this.vodInfosError.next(error);

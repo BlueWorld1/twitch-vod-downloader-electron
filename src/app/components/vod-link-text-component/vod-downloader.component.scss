@@ -3,12 +3,18 @@
   align-items: center;
   justify-content: center;
   margin: auto;
-  width: 550px;
+  width: 750px;
 }
 
 .input-field {
   width: 100%;
   flex-grow: 1;
+  margin-left: 8px;
+}
+
+.source-field {
+  width: 50%;
+  flex-grow: 0.25;
   margin-left: 8px;
 }
 

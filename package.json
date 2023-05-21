@@ -9,8 +9,8 @@
     "test": "ng test",
     "format": "prettier --write \"src/**/*.+(ts|html|css|scss)\"",
     "lint": "eslint ./**/*.ts",
-    "electron": "electron main.js",
-    "electron-build": "electron-builder"
+    "electron": "electron src/electron.js",
+    "electron-build": "npm run build && electron-builder"
   },
   "private": true,
   "dependencies": {

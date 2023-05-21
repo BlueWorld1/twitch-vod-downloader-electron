@@ -6,4 +6,5 @@ export interface VideoResponse {
     login: string;
   };
   title: string;
+  vodId: string;
 }
