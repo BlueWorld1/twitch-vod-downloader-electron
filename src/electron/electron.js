@@ -8,7 +8,7 @@ function saveVodToDisk(source, metadata, format) {
   const filePath = `${metadata.owner.replaceAll(
     " ",
     "_"
-  )}_${metadata.title.replaceAll(" ", "_")}.${format}`;
+  )}_${metadata.title.replaceAll(" ", "_")}.mp4`;
   const command = `${__dirname}/../../bin/youtube-dl --recode-video ${format} -o .\\VOD\\${filePath} ${source.url}`;
 
   const result = spawnSync(command, { stdio: "inherit", shell: true });
