@@ -11,12 +11,7 @@ function saveVodToDisk(source, metadata, format) {
   )}_${metadata.title.replaceAll(" ", "_")}.mp4`;
   const command = `${__dirname}/../../bin/youtube-dl --recode-video ${format} -o .\\VOD\\${filePath} ${source.url}`;
 
-  const result = spawnSync(command, { stdio: "inherit", shell: true });
-
-  if (result.error) {
-    throw result.error;
-  }
-  return true;
+  return spawnSync(command, { stdio: "inherit", shell: true });
 }
 
 function createWindow() {
